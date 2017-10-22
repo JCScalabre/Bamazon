@@ -12,15 +12,14 @@ var connection = mysql.createConnection({
 connection.connect(function(err) {
 	if (err) throw err;
 	console.log("\nWelcome to Bamazon! Here are the items for sale: \n");
-	readstock();
+	// readstock();
+	selectBuy();
+	// updateProduct();
+	connection.end();
 });
 
 var readstock = function() {
-	queryFruits();
-	queryVegetables();
-	queryMeats();
-	connection.end();
-	console.log("Test");
+	queryAll();
 };
 
 var queryFruits = function() {
@@ -52,20 +51,45 @@ var queryMeats = function() {
 	});
 };
 
+var queryAll = function() {
+	queryFruits();
+	queryVegetables();
+	queryMeats();
+	selectBuy();
+}
+
 var selectBuy = function() {
+	console.log("")
 	inquirer.prompt([
 	{
 		type: "input",
 		message: "What would you like to buy? Please enter the item's ID:",
 		name: "choice"
+	},
+	{
+		type: "input",
+		message: "How many would you like to buy?",
+		name: "quantity"
 	}
 
 	]).then(function(answers) {
-		if (answers.choice === "Post") {
-			// postInquire();
-		}
-		if (answers.choice === "Bid") {
-			// bidInquire();
-		};
+		updateProduct();
 	})
-}
+};
+
+function updateProduct() {
+  var query = connection.query(
+    "UPDATE products SET ? WHERE ?",
+    [
+      {
+        stock_quantity: 20
+      },
+      {
+        item_id: 1
+      }
+    ],
+    function(err, res) {
+      console.log(res);
+    }
+  );
+};
