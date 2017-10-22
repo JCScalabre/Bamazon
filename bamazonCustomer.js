@@ -11,11 +11,10 @@ var connection = mysql.createConnection({
 
 connection.connect(function(err) {
 	if (err) throw err;
-	console.log("\nWelcome to Bamazon! Here are the items for sale: \n");
+	// console.log("\nWelcome to Bamazon! Here are the items for sale: \n");
 	// readstock();
 	selectBuy();
 	// updateProduct();
-	connection.end();
 });
 
 var readstock = function() {
@@ -55,7 +54,6 @@ var queryAll = function() {
 	queryFruits();
 	queryVegetables();
 	queryMeats();
-	selectBuy();
 }
 
 var selectBuy = function() {
@@ -65,7 +63,8 @@ var selectBuy = function() {
 		type: "input",
 		message: "What would you like to buy? Please enter the item's ID:",
 		name: "choice"
-	},
+	}
+	,
 	{
 		type: "input",
 		message: "How many would you like to buy?",
@@ -73,23 +72,37 @@ var selectBuy = function() {
 	}
 
 	]).then(function(answers) {
-		updateProduct();
-	})
+		updateProduct(answers.choice, answers.quantity);
+	});
 };
 
-function updateProduct() {
-  var query = connection.query(
-    "UPDATE products SET ? WHERE ?",
-    [
-      {
-        stock_quantity: 20
-      },
-      {
-        item_id: 1
-      }
-    ],
-    function(err, res) {
-      console.log(res);
-    }
-  );
+var updateProduct = function(item, qty) {
+	
+	var query1 = connection.query(
+		"SELECT stock_quantity FROM products WHERE ?",
+		[
+			{
+				item_id: item
+			}
+		],
+		function(err, res) {
+			if (err) throw err;
+			console.log(res);
+		});
+
+	// var query = connection.query(
+	// 	"UPDATE products SET ? WHERE ?",
+	// 	[
+	// 		{
+	// 			stock_quantity: qty
+	// 		},
+	// 		{
+	// 			item_id: item
+	// 		}
+	// 	],
+	// 	function(err, res) {
+
+	// 	}
+	// 	);
+	connection.end();
 };
