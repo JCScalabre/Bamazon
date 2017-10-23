@@ -11,14 +11,32 @@ var connection = mysql.createConnection({
 
 connection.connect(function(err) {
 	if (err) throw err;
-	// console.log("\nWelcome to Bamazon! Here are the items for sale: \n");
-	// readstock();
-	selectBuy();
-	// updateProduct();
+	welcome();
 });
 
+var welcome = function() {
+	inquirer.prompt(
+	{
+		type: "list",
+		message: "Welcome to Bamazon, what would you like to do?",
+		choices: [ "See what's for sale", "Buy an item"],
+		name: "choice"
+	}).then(function(answer) {
+		if (answer.choice === "See what's for sale") {
+			readstock();
+		}
+		if (answer.choice === "Buy an item") {
+			selectBuy();
+		}
+	})
+}
+
 var readstock = function() {
-	queryAll();
+	console.log("\nHere are the items for sale: \n")
+	queryFruits();
+	queryVegetables();
+	queryMeats();
+	connection.end();
 };
 
 var queryFruits = function() {
@@ -50,12 +68,6 @@ var queryMeats = function() {
 	});
 };
 
-var queryAll = function() {
-	queryFruits();
-	queryVegetables();
-	queryMeats();
-}
-
 var selectBuy = function() {
 	console.log("")
 	inquirer.prompt([
@@ -72,37 +84,53 @@ var selectBuy = function() {
 	}
 
 	]).then(function(answers) {
-		updateProduct(answers.choice, answers.quantity);
+		var product_ids = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
+		if (product_ids.indexOf(answers.choice) === -1) {
+			console.log("Error: Please enter a valid product ID.");
+			selectBuy();
+		} else {
+			readQuantity(answers.choice, answers.quantity);
+		}
 	});
 };
 
-var updateProduct = function(item, qty) {
-	
-	var query1 = connection.query(
-		"SELECT stock_quantity FROM products WHERE ?",
+var readQuantity = function(item, quantityDesired) {
+	var query = connection.query(
+		"SELECT stock_quantity, product_name_plural, price FROM products WHERE ?",
 		[
-			{
-				item_id: item
-			}
+		{
+			item_id: item
+		}
 		],
 		function(err, res) {
 			if (err) throw err;
-			console.log(res);
+			if (((res[0].stock_quantity - quantityDesired) < 0)) {
+				console.log("Sorry! We do not have " +  quantityDesired + " " + res[0].product_name_plural + " in stock. Please enter a smaller amount.");
+				selectBuy();
+			} else {
+				updateProduct(item, res[0].stock_quantity - quantityDesired);
+				console.log("Successfully bought " + quantityDesired + " " + res[0].product_name_plural + " for " + "$" + res[0].price*quantityDesired + ".");
+				console.log("There are " + (res[0].stock_quantity - quantityDesired) + " " + res[0].product_name_plural + " left in stock.");
+			}
 		});
+};
 
-	// var query = connection.query(
-	// 	"UPDATE products SET ? WHERE ?",
-	// 	[
-	// 		{
-	// 			stock_quantity: qty
-	// 		},
-	// 		{
-	// 			item_id: item
-	// 		}
-	// 	],
-	// 	function(err, res) {
+var updateProduct = function(item, qty) {
 
-	// 	}
-	// 	);
+	var query = connection.query(
+		"UPDATE products SET ? WHERE ?",
+		[
+		{
+			stock_quantity: qty
+		},
+		{
+			item_id: item
+		}
+		],
+		function(err, res) {
+
+		}
+		);
 	connection.end();
 };
+
