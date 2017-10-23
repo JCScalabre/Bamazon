@@ -19,7 +19,7 @@ var welcome = function() {
 	{
 		type: "list",
 		message: "Welcome to Bamazon, what would you like to do?",
-		choices: [ "See what's for sale", "Buy an item"],
+		choices: ["See what's for sale", "Buy an item"],
 		name: "choice"
 	}).then(function(answer) {
 		if (answer.choice === "See what's for sale") {
@@ -104,7 +104,7 @@ var readQuantity = function(item, quantityDesired) {
 		],
 		function(err, res) {
 			if (err) throw err;
-			if (((res[0].stock_quantity - quantityDesired) < 0)) {
+			if ((res[0].stock_quantity - quantityDesired) < 0) {
 				console.log("Sorry! We do not have " +  quantityDesired + " " + res[0].product_name_plural + " in stock. Please enter a smaller amount.");
 				selectBuy();
 			} else {
