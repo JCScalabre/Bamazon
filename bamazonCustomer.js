@@ -84,7 +84,7 @@ var selectBuy = function() {
 	}
 
 	]).then(function(answers) {
-		var product_ids = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
+		var product_ids = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"];
 		if (product_ids.indexOf(answers.choice) === -1) {
 			console.log("Error: Please enter a valid product ID.");
 			selectBuy();
