@@ -81,7 +81,7 @@ var inquireLowInventory = function() {
 		message: "Enter item stock threshold:",
 		name: "choice"
 	}).then(function(answer) {
-		console.log("Displaying all products that have a stock quantity lower than " + answer.choice);
+		console.log("Displaying all products that have a stock quantity lower than: " + answer.choice);
 		viewLowInventory(answer.choice);
 	});
 };
